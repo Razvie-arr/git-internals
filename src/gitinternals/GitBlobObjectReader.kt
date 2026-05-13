@@ -30,7 +30,7 @@ private fun readUncompressedContent(objectLocation: Path): String {
             while (data != -1) {
                 val char = data.toChar()
                 if (char == '\u0000') {
-                    sb.append('\n') // Your clever header separator
+                    sb.append('\n')
                 } else {
                     sb.append(char)
                 }
