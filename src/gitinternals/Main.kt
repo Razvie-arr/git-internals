@@ -1,5 +1,0 @@
-package gitinternals
-
-fun main() {
-
-}
