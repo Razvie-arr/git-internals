@@ -10,7 +10,7 @@ import kotlin.io.path.exists
 /**
  * Reads and prints uncompressed content of Git object
  */
-fun main() {
+fun driver() {
     println("Enter git object location:")
     val objectLocationInput = readln()
     val objectLocationPath = Path(objectLocationInput)
@@ -29,7 +29,7 @@ private fun readUncompressedContent(objectLocation: Path): String {
             var data = iis.read()
             while (data != -1) {
                 val char = data.toChar()
-                if (char == '\u0000') {
+                if (isHeaderSeparator(char)) {
                     sb.append('\n')
                 } else {
                     sb.append(char)
@@ -40,3 +40,5 @@ private fun readUncompressedContent(objectLocation: Path): String {
         }
     }
 }
+
+private fun isHeaderSeparator(ch: Char) = ch == '\u0000'

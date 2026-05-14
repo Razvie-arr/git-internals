@@ -16,7 +16,8 @@ import java.util.List;
 // version 1.2
 public class GitInternalsTest extends StageTest<List<String>> {
 
-    private final String gitOnePath = "Git Internals/task/test/git-internals-test-files/stage1/gitone/objects/";
+    private final String gitOnePath = "Git Internals/task/test/git-internals-test-files/stage2/gitone/\n";
+
 
     @BeforeClass
     public static void setup() {
@@ -30,10 +31,11 @@ public class GitInternalsTest extends StageTest<List<String>> {
                     .setDirectory(repoDir)
                     .call();
         } catch (Exception e) {
-            System.err.println("Failed to clone the test repository. Please check your internet connection and the repository URI.");
+            System.err.println("Failed to clone the test repository. Please check your internet connection. For other issues, report this to support.");
             e.printStackTrace();
         }
     }
+
 
     @AfterClass
     public static void tearDown() {
@@ -55,34 +57,58 @@ public class GitInternalsTest extends StageTest<List<String>> {
 
     @Override
     public List<TestCase<List<String>>> generate() {
+
         return Arrays.asList(
                 new TestCase<List<String>>()
                         .setInput(
-                                gitOnePath + "cd/0875583aabe89ee197ea133980a9085d08e497\n")
+                                gitOnePath +
+                                        "0eee6a98471a350b2c2316313114185ecaf82f0e\n")
                         .setAttach(Arrays.asList(
-                                "Enter git object location:",
-                                "blob 13",
-                                "Hello world!")),
+                                "Enter .git directory location:",
+                                "Enter git object hash:",
+                                "type:commit length:216")),
                 new TestCase<List<String>>()
                         .setInput(
-                                gitOnePath + "06/fcdd77c9348567c50638b30d406500f521c304\n")
+                                gitOnePath +
+                                        "490f96725348e92770d3c6bab9ec532564b7ebe0\n")
                         .setAttach(Arrays.asList(
-                                "Enter git object location:",
-                                "blob 23",
-                                "first line",
-                                "second line")),
+                                "Enter .git directory location:",
+                                "Enter git object hash:",
+                                "type:blob length:85")),
                 new TestCase<List<String>>()
                         .setInput(
-                                gitOnePath + "20/aeba2bad864cf6904f9caaea55f46f03ce6ac1\n")
+                                gitOnePath +
+                                        "618383db6d7ee3bd2e97b871205f113b6a3ba854\n")
                         .setAttach(Arrays.asList(
-                                "Enter git object location:",
-                                "blob 34",
-                                "first line",
-                                "second line",
-                                "third line"))
+                                "Enter .git directory location:",
+                                "Enter git object hash:",
+                                "type:blob length:14")),
+                new TestCase<List<String>>()
+                        .setInput(
+                                gitOnePath +
+                                        "a7b882bbf2db5d90287e9affc7e6f3b3c740b327\n")
+                        .setAttach(Arrays.asList(
+                                "Enter .git directory location:",
+                                "Enter git object hash:",
+                                "type:tree length:35")),
+                new TestCase<List<String>>()
+                        .setInput(
+                                gitOnePath +
+                                        "fb043556c251cb450a0d55e4ceb1ff35e12029c3\n")
+                        .setAttach(Arrays.asList(
+                                "Enter .git directory location:",
+                                "Enter git object hash:",
+                                "type:tree length:73")),
+                new TestCase<List<String>>()
+                        .setInput(
+                                gitOnePath +
+                                        "ad3a818dc87b9940935b24a5aa93fac00f086bf9\n")
+                        .setAttach(Arrays.asList(
+                                "Enter .git directory location:",
+                                "Enter git object hash:",
+                                "type:tree length:35"))
         );
     }
-
 
     @Override
     public CheckResult check(String reply, List<String> expectedOutput) {
