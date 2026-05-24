@@ -8,9 +8,9 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 /**
- * Reads and prints uncompressed content of Git object
+ * Stage 1: Reads and prints uncompressed content of Git object
  */
-fun driver() {
+fun printObjectContent() {
     println("Enter git object location:")
     val objectLocationInput = readln()
     val objectLocationPath = Path(objectLocationInput)

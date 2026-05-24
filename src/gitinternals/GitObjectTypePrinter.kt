@@ -7,7 +7,10 @@ import java.util.zip.InflaterInputStream
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
-fun main() {
+/**
+ * Stage 2: Reads and prints Git object type and length
+ */
+fun printGitObjectType() {
     println("Enter .git directory location:")
     val gitPath = Path(readln())
     println("Enter git object hash:")
