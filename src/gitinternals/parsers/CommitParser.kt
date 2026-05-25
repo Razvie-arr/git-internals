@@ -1,6 +1,6 @@
 package gitinternals.parsers
 
-import gitinternals.utils.readContent
+import gitinternals.utils.readUntilEnd
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -14,7 +14,7 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
         var author = ""
         var committer = ""
 
-        val content = readContent(stream)
+        val content = readUntilEnd(stream)
         val lines = content.lines()
         var index = 0
 

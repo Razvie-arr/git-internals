@@ -13,7 +13,7 @@ fun readHeader(iis: InflaterInputStream): String {
     return header.toString()
 }
 
-fun readContent(iis: InflaterInputStream): String {
+fun readUntilEnd(iis: InflaterInputStream): String {
     val content = StringBuilder()
     var data = iis.read()
     while (data != -1) {
