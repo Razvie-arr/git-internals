@@ -1,39 +1,45 @@
 package gitinternals
 
-import gitinternals.parsers.BlobParser
-import gitinternals.parsers.CommitParser
-import gitinternals.parsers.GitObjectParser
-import gitinternals.parsers.TreeParser
-import gitinternals.utils.buildGitObjectPath
-import gitinternals.utils.readHeader
-import java.io.FileInputStream
-import java.nio.file.Path
-import java.util.zip.InflaterInputStream
+import gitinternals.commands.CatFileCommand
+import gitinternals.commands.GitCommand
+import gitinternals.commands.ListBranchesCommand
 import kotlin.io.path.Path
+import kotlin.io.path.notExists
 
 /**
- * Stages 3-4: Prints Git object information. Supports blob, commit and a tree types.
+ * Git internals CLI application.
+ *
+ * Supports the following commands:
+ * - cat-file: Display Git object information (blob, commit, tree)
+ * - list-branches: List repository branches
+ *
+ * Usage:
+ * 1. Enter the path to the .git directory
+ * 2. Enter a command name
+ * 3. Follow command-specific prompts
  */
+
+private val COMMAND_REGISTRY: Map<String, () -> GitCommand> = mapOf(
+    "cat-file" to ::CatFileCommand,
+    "list-branches" to ::ListBranchesCommand
+)
+
 fun main() {
     println("Enter .git directory location:")
     val gitPath = Path(readln())
-    println("Enter git object hash:")
-    val gitObjectHash = readln()
-    val gitObjectPath = buildGitObjectPath(gitPath, gitObjectHash)
-    println(getObjectInfo(gitObjectPath))
-}
-
-private fun getObjectInfo(gitObjectPath: Path): String {
-    FileInputStream(gitObjectPath.toFile()).use { fis ->
-        InflaterInputStream(fis).use { iis ->
-            val type = readHeader(iis).split(" ")[0]
-            val parser: GitObjectParser = when (type) {
-                "blob" -> BlobParser(iis)
-                "commit" -> CommitParser(iis)
-                "tree" -> TreeParser(iis)
-                else -> error("Not supported git object provided.")
-            }
-            return parser.parseToString()
-        }
+    if (gitPath.notExists()) {
+        error("Git path doesn't exist.")
     }
+
+    println("Enter command: ")
+    val inputCommand = readln()
+
+    val factory = COMMAND_REGISTRY[inputCommand]
+    if (factory == null) {
+        println("Unsupported command: $inputCommand.")
+        return
+    }
+
+    val command = factory()
+    command.execute(gitPath)
 }
