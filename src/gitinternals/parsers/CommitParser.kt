@@ -39,7 +39,7 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
             appendLine("author: $author")
             appendLine("committer: $committer")
             appendLine("commit message:")
-            append(commitMessage)
+            appendLine(commitMessage)
         }
     }
 

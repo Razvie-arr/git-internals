@@ -31,7 +31,7 @@ fun main() {
         error("Git path doesn't exist.")
     }
 
-    println("Enter command: ")
+    println("Enter command:")
     val inputCommand = readln()
 
     val factory = COMMAND_REGISTRY[inputCommand]

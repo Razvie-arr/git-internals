@@ -12,10 +12,10 @@ import java.util.zip.InflaterInputStream
 
 class CatFileCommand : GitCommand {
 
-    override fun execute(gitFolder: Path) {
+    override fun execute(gitDir: Path) {
         println("Enter git object hash:")
         val gitObjectHash = readln()
-        val gitObjectPath = buildGitObjectPath(gitFolder, gitObjectHash)
+        val gitObjectPath = buildGitObjectPath(gitDir, gitObjectHash)
         println(getObjectInfo(gitObjectPath))
     }
 

@@ -4,6 +4,6 @@ import java.nio.file.Path
 
 interface GitCommand {
 
-    fun execute(gitFolder: Path)
+    fun execute(gitDir: Path)
 
 }
