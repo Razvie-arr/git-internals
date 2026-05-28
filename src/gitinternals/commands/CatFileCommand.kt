@@ -29,7 +29,11 @@ class CatFileCommand : GitCommand {
                     "tree" -> TreeParser(iis)
                     else -> error("Unsupported git object type.")
                 }
-                return parser.parseToString()
+
+                return buildString {
+                    appendLine("*${type.uppercase()}*")
+                    append(parser.parseToString())
+                }
             }
         }
     }

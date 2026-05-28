@@ -6,7 +6,7 @@ class TreeParser(val stream: InflaterInputStream) : GitObjectParser {
 
     override fun parseToString(): String {
         val treeElements = parseElements()
-        return "*TREE*\n" + treeElements.joinToString("\n") { element ->
+        return treeElements.joinToString("\n") { element ->
             "${element.metadata} ${element.hash} ${element.name}"
         }
     }

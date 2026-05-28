@@ -3,6 +3,7 @@ package gitinternals
 import gitinternals.commands.CatFileCommand
 import gitinternals.commands.GitCommand
 import gitinternals.commands.ListBranchesCommand
+import gitinternals.commands.LogCommand
 import kotlin.io.path.Path
 import kotlin.io.path.notExists
 
@@ -21,7 +22,8 @@ import kotlin.io.path.notExists
 
 private val COMMAND_REGISTRY: Map<String, () -> GitCommand> = mapOf(
     "cat-file" to ::CatFileCommand,
-    "list-branches" to ::ListBranchesCommand
+    "list-branches" to ::ListBranchesCommand,
+    "log" to ::LogCommand
 )
 
 fun main() {

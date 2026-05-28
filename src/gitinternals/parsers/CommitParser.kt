@@ -31,7 +31,7 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
 
         val commitMessage = lines.drop(index + 1).joinToString("\n")
 
-        return "*COMMIT*\n" + buildString {
+        return buildString {
             appendLine("tree: $tree")
             if (parents.isNotEmpty()) {
                 appendLine("parents: ${parents.joinToString(" | ")}")
@@ -39,7 +39,7 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
             appendLine("author: $author")
             appendLine("committer: $committer")
             appendLine("commit message:")
-            appendLine(commitMessage)
+            append(commitMessage)
         }
     }
 
