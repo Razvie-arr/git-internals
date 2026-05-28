@@ -9,6 +9,10 @@ import java.util.zip.InflaterInputStream
 class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
 
     override fun parseToString(): String {
+        return parse().formatToString()
+    }
+
+    fun parse(): ParsedCommit {
         var tree = ""
         val parents = mutableListOf<String>()
         var author = ""
@@ -25,22 +29,14 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
                 line.startsWith("parent") -> parents += line.removePrefix("parent ")
                 line.startsWith("author") -> author = formatAuthor(line.removePrefix("author "))
                 line.startsWith("committer ") -> committer = formatCommitter(line.removePrefix("committer "))
+                line.startsWith("gpgsig ") -> index = skipSignature(lines, index)
             }
             index++
         }
 
-        val commitMessage = lines.drop(index + 1).joinToString("\n")
+        val message = lines.drop(index + 1).joinToString("\n")
 
-        return buildString {
-            appendLine("tree: $tree")
-            if (parents.isNotEmpty()) {
-                appendLine("parents: ${parents.joinToString(" | ")}")
-            }
-            appendLine("author: $author")
-            appendLine("committer: $committer")
-            appendLine("commit message:")
-            append(commitMessage)
-        }
+        return ParsedCommit(tree, parents, author, committer, message)
     }
 
     private fun formatAuthor(rawAuthor: String): String {
@@ -54,11 +50,12 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
     }
 
     private fun parseDeveloperInfo(rawDeveloper: String): CommitDeveloperInfo {
-        val split = rawDeveloper.split(" ")
-        val name = split[0]
-        val email = split[1].removePrefix("<").removeSuffix(">")
-        val timestamp = split[2]
-        val zoneOffset = split[3]
+        val name = rawDeveloper.substringBefore(" <")
+        val email = rawDeveloper.substringAfter("<").substringBefore(">")
+        val timeData = rawDeveloper.substringAfter("> ").split(" ")
+        val timestamp = timeData[0]
+        val zoneOffset = timeData[1]
+
         val instant = Instant.ofEpochSecond(timestamp.toLong())
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss XXX")
             .withZone(ZoneOffset.of(zoneOffset))
@@ -66,6 +63,38 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
         return CommitDeveloperInfo(name, email, formatter.format(instant))
     }
 
+    private fun skipSignature(lines: List<String>, startIndex: Int): Int {
+        var index = startIndex + 1
+
+        while (index < lines.size) {
+            if (lines[index].isBlank()) {
+                return index + 1
+            }
+            index++
+        }
+
+        return index
+    }
+
+}
+
+data class ParsedCommit(
+    val tree: String,
+    val parents: List<String>,
+    val author: String,
+    val committer: String,
+    val message: String
+)
+
+fun ParsedCommit.formatToString(): String = buildString {
+    appendLine("tree: $tree")
+    if (parents.isNotEmpty()) {
+        appendLine("parents: ${parents.joinToString(" | ")}")
+    }
+    appendLine("author: $author")
+    appendLine("committer: $committer")
+    appendLine("commit message:")
+    append(message)
 }
 
 private data class CommitDeveloperInfo(

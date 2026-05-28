@@ -4,6 +4,7 @@ import gitinternals.commands.CatFileCommand
 import gitinternals.commands.GitCommand
 import gitinternals.commands.ListBranchesCommand
 import gitinternals.commands.LogCommand
+import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.notExists
 
@@ -20,7 +21,7 @@ import kotlin.io.path.notExists
  * 3. Follow command-specific prompts
  */
 
-private val COMMAND_REGISTRY: Map<String, () -> GitCommand> = mapOf(
+private val COMMAND_REGISTRY: Map<String, (gitDir: Path) -> GitCommand> = mapOf(
     "cat-file" to ::CatFileCommand,
     "list-branches" to ::ListBranchesCommand,
     "log" to ::LogCommand
@@ -28,8 +29,8 @@ private val COMMAND_REGISTRY: Map<String, () -> GitCommand> = mapOf(
 
 fun main() {
     println("Enter .git directory location:")
-    val gitPath = Path(readln())
-    if (gitPath.notExists()) {
+    val gitDir = Path(readln())
+    if (gitDir.notExists()) {
         error("Git path doesn't exist.")
     }
 
@@ -42,6 +43,6 @@ fun main() {
         return
     }
 
-    val command = factory()
-    command.execute(gitPath)
+    val command = factory(gitDir)
+    command.execute()
 }

@@ -3,9 +3,9 @@ package gitinternals.commands
 import java.nio.file.Path
 import kotlin.io.path.*
 
-class ListBranchesCommand : GitCommand {
+class ListBranchesCommand(private val gitDir: Path) : GitCommand {
 
-    override fun execute(gitDir: Path) {
+    override fun execute() {
         val gitHeadFile: Path = gitDir.resolve("HEAD")
         if (gitHeadFile.notExists()) {
             error("Git HEAD file doesn't exist.")
