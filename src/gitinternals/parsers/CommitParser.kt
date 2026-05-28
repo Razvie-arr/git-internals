@@ -9,7 +9,17 @@ import java.util.zip.InflaterInputStream
 class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
 
     override fun parseToString(): String {
-        return parse().formatToString()
+        val commit = parse()
+        return buildString {
+            appendLine("tree: ${commit.tree}")
+            if (commit.parents.isNotEmpty()) {
+                appendLine("parents: ${commit.parents.joinToString(" | ")}")
+            }
+            appendLine("author: $commit.author")
+            appendLine("committer: ${commit.committer}")
+            appendLine("commit message:")
+            append(commit.message)
+        }
     }
 
     fun parse(): ParsedCommit {
@@ -85,17 +95,6 @@ data class ParsedCommit(
     val committer: String,
     val message: String
 )
-
-fun ParsedCommit.formatToString(): String = buildString {
-    appendLine("tree: $tree")
-    if (parents.isNotEmpty()) {
-        appendLine("parents: ${parents.joinToString(" | ")}")
-    }
-    appendLine("author: $author")
-    appendLine("committer: $committer")
-    appendLine("commit message:")
-    append(message)
-}
 
 private data class CommitDeveloperInfo(
     val name: String,
