@@ -1,14 +1,13 @@
 package gitinternals.parsers
 
+import gitinternals.objects.TreeElement
+import gitinternals.objects.TreeObject
 import java.util.zip.InflaterInputStream
 
-class TreeParser(val stream: InflaterInputStream) : GitObjectParser {
+class TreeParser(val stream: InflaterInputStream) : GitObjectParser<TreeObject> {
 
-    override fun parseToString(): String {
-        val treeElements = parseElements()
-        return treeElements.joinToString("\n") { element ->
-            "${element.metadata} ${element.hash} ${element.name}"
-        }
+    override fun parse(): TreeObject {
+        return TreeObject(parseElements())
     }
 
     private fun parseElements(): List<TreeElement> {
@@ -49,7 +48,4 @@ class TreeParser(val stream: InflaterInputStream) : GitObjectParser {
         }
     }
 
-
 }
-
-private data class TreeElement(val metadata: String, val name: String, val hash: String)

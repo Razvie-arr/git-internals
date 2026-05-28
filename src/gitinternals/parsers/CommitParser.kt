@@ -1,28 +1,15 @@
 package gitinternals.parsers
 
+import gitinternals.objects.CommitObject
 import gitinternals.utils.readUntilEnd
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.zip.InflaterInputStream
 
-class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
+class CommitParser(val stream: InflaterInputStream) : GitObjectParser<CommitObject> {
 
-    override fun parseToString(): String {
-        val commit = parse()
-        return buildString {
-            appendLine("tree: ${commit.tree}")
-            if (commit.parents.isNotEmpty()) {
-                appendLine("parents: ${commit.parents.joinToString(" | ")}")
-            }
-            appendLine("author: $commit.author")
-            appendLine("committer: ${commit.committer}")
-            appendLine("commit message:")
-            append(commit.message)
-        }
-    }
-
-    fun parse(): ParsedCommit {
+    override fun parse(): CommitObject {
         var tree = ""
         val parents = mutableListOf<String>()
         var author = ""
@@ -37,8 +24,8 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
             when {
                 line.startsWith("tree") -> tree = line.removePrefix("tree ")
                 line.startsWith("parent") -> parents += line.removePrefix("parent ")
-                line.startsWith("author") -> author = formatAuthor(line.removePrefix("author "))
-                line.startsWith("committer ") -> committer = formatCommitter(line.removePrefix("committer "))
+                line.startsWith("author") -> author = parseAuthor(line.removePrefix("author "))
+                line.startsWith("committer ") -> committer = parseCommitter(line.removePrefix("committer "))
                 line.startsWith("gpgsig ") -> index = skipSignature(lines, index)
             }
             index++
@@ -46,15 +33,15 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
 
         val message = lines.drop(index + 1).joinToString("\n")
 
-        return ParsedCommit(tree, parents, author, committer, message)
+        return CommitObject(tree, parents, author, committer, message)
     }
 
-    private fun formatAuthor(rawAuthor: String): String {
+    private fun parseAuthor(rawAuthor: String): String {
         val devInfo = parseDeveloperInfo(rawAuthor)
         return "${devInfo.name} ${devInfo.email} original timestamp: ${devInfo.dateTimeWithZone}"
     }
 
-    private fun formatCommitter(rawCommiter: String): String {
+    private fun parseCommitter(rawCommiter: String): String {
         val devInfo = parseDeveloperInfo(rawCommiter)
         return "${devInfo.name} ${devInfo.email} commit timestamp: ${devInfo.dateTimeWithZone}"
     }
@@ -86,18 +73,10 @@ class CommitParser(val stream: InflaterInputStream) : GitObjectParser {
         return index
     }
 
+    private data class CommitDeveloperInfo(
+        val name: String,
+        val email: String,
+        val dateTimeWithZone: String
+    )
+
 }
-
-data class ParsedCommit(
-    val tree: String,
-    val parents: List<String>,
-    val author: String,
-    val committer: String,
-    val message: String
-)
-
-private data class CommitDeveloperInfo(
-    val name: String,
-    val email: String,
-    val dateTimeWithZone: String
-)

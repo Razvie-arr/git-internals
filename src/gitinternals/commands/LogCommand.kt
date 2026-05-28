@@ -1,12 +1,9 @@
 package gitinternals.commands
 
+import gitinternals.objects.CommitObject
 import gitinternals.parsers.CommitParser
-import gitinternals.parsers.ParsedCommit
-import gitinternals.utils.buildGitObjectPath
-import gitinternals.utils.readHeader
-import java.io.FileInputStream
+import gitinternals.utils.useGitObjectStream
 import java.nio.file.Path
-import java.util.zip.InflaterInputStream
 import kotlin.io.path.notExists
 import kotlin.io.path.readText
 
@@ -48,17 +45,13 @@ class LogCommand(private val gitDir: Path) : GitCommand {
         error("More than two parent commits are not supported.")
     }
 
-    private fun parseCommit(commitHash: String): ParsedCommit {
-        val commitObject = buildGitObjectPath(gitDir, commitHash)
-        FileInputStream(commitObject.toFile()).use { fis ->
-            InflaterInputStream(fis).use { iis ->
-                readHeader(iis)
-                return CommitParser(iis).parse()
-            }
+    private fun parseCommit(commitHash: String): CommitObject {
+        return useGitObjectStream(gitDir, commitHash) { _, stream ->
+            CommitParser(stream).parse()
         }
     }
 
-    private fun printCommitInfo(commitHash: String, commit: ParsedCommit, mergedParent: Boolean) {
+    private fun printCommitInfo(commitHash: String, commit: CommitObject, mergedParent: Boolean) {
         val mergedParentLabel = if (mergedParent) " (merged)" else ""
         println("Commit: $commitHash$mergedParentLabel")
         println(commit.committer)

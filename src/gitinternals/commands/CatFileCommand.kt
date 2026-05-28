@@ -2,38 +2,32 @@ package gitinternals.commands
 
 import gitinternals.parsers.BlobParser
 import gitinternals.parsers.CommitParser
-import gitinternals.parsers.GitObjectParser
 import gitinternals.parsers.TreeParser
-import gitinternals.utils.buildGitObjectPath
-import gitinternals.utils.readHeader
-import java.io.FileInputStream
+import gitinternals.utils.useGitObjectStream
 import java.nio.file.Path
-import java.util.zip.InflaterInputStream
 
 class CatFileCommand(private val gitDir: Path) : GitCommand {
 
     override fun execute() {
         println("Enter git object hash:")
         val gitObjectHash = readln()
-        val gitObjectPath = buildGitObjectPath(gitDir, gitObjectHash)
-        println(getObjectInfo(gitObjectPath))
+        println(getObjectInfo(gitObjectHash))
     }
 
-    private fun getObjectInfo(gitObjectPath: Path): String {
-        FileInputStream(gitObjectPath.toFile()).use { fis ->
-            InflaterInputStream(fis).use { iis ->
-                val type = readHeader(iis).substringBefore(' ')
-                val parser: GitObjectParser = when (type) {
-                    "blob" -> BlobParser(iis)
-                    "commit" -> CommitParser(iis)
-                    "tree" -> TreeParser(iis)
-                    else -> error("Unsupported git object type.")
-                }
+    private fun getObjectInfo(gitObjectHash: String): String {
+        return useGitObjectStream(gitDir, gitObjectHash) { type, stream ->
+            val parser = when (type) {
+                "blob" -> BlobParser(stream)
+                "commit" -> CommitParser(stream)
+                "tree" -> TreeParser(stream)
+                else -> error("Unsupported git object type.")
+            }
 
-                return buildString {
-                    appendLine("*${type.uppercase()}*")
-                    append(parser.parseToString())
-                }
+            val parsedObject = parser.parse()
+
+            buildString {
+                appendLine("*${type.uppercase()}*")
+                append(parsedObject.format())
             }
         }
     }

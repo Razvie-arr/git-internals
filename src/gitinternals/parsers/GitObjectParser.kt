@@ -1,7 +1,7 @@
 package gitinternals.parsers
 
-interface GitObjectParser {
+sealed interface GitObjectParser<T> {
 
-    fun parseToString(): String
+    fun parse(): T
 
 }

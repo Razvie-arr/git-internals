@@ -1,5 +1,7 @@
 package gitinternals.utils
 
+import java.io.FileInputStream
+import java.nio.file.Path
 import java.util.zip.InflaterInputStream
 
 fun readHeader(iis: InflaterInputStream): String {
@@ -22,6 +24,16 @@ fun readUntilEnd(iis: InflaterInputStream): String {
         data = iis.read()
     }
     return content.toString()
+}
+
+fun <T> useGitObjectStream(gitDir: Path, hash: String, action: (type: String, stream: InflaterInputStream) -> T): T {
+    val gitObjectPath = buildGitObjectPath(gitDir, hash)
+    return FileInputStream(gitObjectPath.toFile()).use { fis ->
+        InflaterInputStream(fis).use { stream ->
+            val type = readHeader(stream).substringBefore(' ')
+            action(type, stream)
+        }
+    }
 }
 
 private fun isHeaderSeparator(data: Int) = data == 0
