@@ -10,7 +10,7 @@ class CommitFormatter : GitObjectFormatter<CommitObject> {
             if (gitObject.parents.isNotEmpty()) {
                 appendLine("parents: ${gitObject.parents.joinToString(" | ")}")
             }
-            appendLine("author: $gitObject.author")
+            appendLine("author: ${gitObject.author}")
             appendLine("committer: ${gitObject.committer}")
             appendLine("commit message:")
             append(gitObject.message)
