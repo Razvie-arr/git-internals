@@ -1,9 +1,6 @@
 package gitinternals
 
-import gitinternals.commands.CatFileCommand
-import gitinternals.commands.GitCommand
-import gitinternals.commands.ListBranchesCommand
-import gitinternals.commands.LogCommand
+import gitinternals.commands.*
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.notExists
@@ -15,6 +12,7 @@ import kotlin.io.path.notExists
  * - cat-file: Display Git object information (blob, commit, tree)
  * - list-branches: List repository branches
  * - log: Display a branch history
+ * - commit-tree: List files contained in a commit tree
  *
  * Usage:
  * 1. Enter the path to the .git directory
@@ -25,7 +23,8 @@ import kotlin.io.path.notExists
 private val COMMAND_REGISTRY: Map<String, (gitDir: Path) -> GitCommand> = mapOf(
     "cat-file" to ::CatFileCommand,
     "list-branches" to ::ListBranchesCommand,
-    "log" to ::LogCommand
+    "log" to ::LogCommand,
+    "commit-tree" to ::CommitTreeCommand
 )
 
 fun main() {
