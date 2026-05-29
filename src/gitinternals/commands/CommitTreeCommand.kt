@@ -22,7 +22,11 @@ class CommitTreeCommand(private val gitDir: Path) : GitCommand {
         for (entry in tree.entries) {
             val type = entry.type()
             when (type) {
-                TreeEntryType.BLOB -> println("$prefix/${entry.name}")
+                TreeEntryType.BLOB -> {
+                    val filePath = if (prefix.isNotEmpty()) "$prefix/${entry.name}" else entry.name
+                    println(filePath)
+                }
+
                 TreeEntryType.TREE -> printTreeFiles(entry.hash, entry.name)
             }
         }
