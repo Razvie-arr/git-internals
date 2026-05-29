@@ -14,6 +14,7 @@ import kotlin.io.path.notExists
  * Supports the following commands:
  * - cat-file: Display Git object information (blob, commit, tree)
  * - list-branches: List repository branches
+ * - log: Display a branch history
  *
  * Usage:
  * 1. Enter the path to the .git directory
