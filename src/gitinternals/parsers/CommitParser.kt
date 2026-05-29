@@ -7,7 +7,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.zip.InflaterInputStream
 
-class CommitParser(val stream: InflaterInputStream) : GitObjectParser<CommitObject> {
+class CommitParser(private val stream: InflaterInputStream) : GitObjectParser<CommitObject> {
 
     override fun parse(): CommitObject {
         var tree = ""

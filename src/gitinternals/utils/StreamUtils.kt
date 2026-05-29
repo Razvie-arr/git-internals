@@ -4,26 +4,38 @@ import java.io.FileInputStream
 import java.nio.file.Path
 import java.util.zip.InflaterInputStream
 
-fun readHeader(iis: InflaterInputStream): String {
+fun readHeader(stream: InflaterInputStream): String {
     val header = StringBuilder()
-    var data = iis.read()
+    var data = stream.read()
     while (!isHeaderSeparator(data)) {
         val char = data.toChar()
         header.append(char)
-        data = iis.read()
+        data = stream.read()
     }
     return header.toString()
 }
 
-fun readUntilEnd(iis: InflaterInputStream): String {
+fun readUntilEnd(stream: InflaterInputStream): String {
     val content = StringBuilder()
-    var data = iis.read()
+    var data = stream.read()
     while (data != -1) {
         val char = data.toChar()
         content.append(char)
-        data = iis.read()
+        data = stream.read()
     }
     return content.toString()
+}
+
+fun readUntilDelimiter(stream: InflaterInputStream, delimiter: Char): String? {
+    val sb = StringBuilder()
+    var data = stream.read()
+    if (data == -1) return null
+
+    while (data != -1 && data.toChar() != delimiter) {
+        sb.append(data.toChar())
+        data = stream.read()
+    }
+    return sb.toString()
 }
 
 fun <T> useGitObjectStream(gitDir: Path, hash: String, action: (type: String, stream: InflaterInputStream) -> T): T {

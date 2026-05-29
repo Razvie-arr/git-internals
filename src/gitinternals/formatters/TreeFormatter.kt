@@ -6,7 +6,7 @@ class TreeFormatter : GitObjectFormatter<TreeObject> {
 
     override fun format(gitObject: TreeObject): String {
         return gitObject.elements.joinToString("\n") { element ->
-            "${element.metadata} ${element.hash} ${element.name}"
+            "${element.permissions} ${element.hash} ${element.name}"
         }
     }
 

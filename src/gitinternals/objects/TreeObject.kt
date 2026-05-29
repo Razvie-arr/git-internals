@@ -2,10 +2,10 @@ package gitinternals.objects
 
 import gitinternals.formatters.TreeFormatter
 
-data class TreeObject(val elements: List<TreeElement>) : GitObject {
+data class TreeObject(val elements: List<TreeEntry>) : GitObject {
 
     override fun format() = TreeFormatter().format(this)
 
 }
 
-data class TreeElement(val metadata: String, val name: String, val hash: String)
+data class TreeEntry(val permissions: String, val name: String, val hash: String)

@@ -1,41 +1,30 @@
 package gitinternals.parsers
 
-import gitinternals.objects.TreeElement
+import gitinternals.objects.TreeEntry
 import gitinternals.objects.TreeObject
+import gitinternals.utils.readUntilDelimiter
 import java.util.zip.InflaterInputStream
 
-class TreeParser(val stream: InflaterInputStream) : GitObjectParser<TreeObject> {
+class TreeParser(private val stream: InflaterInputStream) : GitObjectParser<TreeObject> {
 
     override fun parse(): TreeObject {
-        return TreeObject(parseElements())
+        return TreeObject(parseEntries())
     }
 
-    private fun parseElements(): List<TreeElement> {
+    private fun parseEntries(): List<TreeEntry> {
         return buildList {
             while (true) {
-                val element = parseElement() ?: break
-                add(element)
+                val entry = parseNextEntry() ?: break
+                add(entry)
             }
         }
     }
 
-    private fun parseElement(): TreeElement? {
-        val metadata = readUntilDelimiter(' ') ?: return null
-        val name = readUntilDelimiter('\u0000') ?: return null
+    private fun parseNextEntry(): TreeEntry? {
+        val permissions = readUntilDelimiter(stream, ' ') ?: return null
+        val name = readUntilDelimiter(stream, '\u0000') ?: return null
         val hash = readHash()
-        return TreeElement(metadata, name, hash)
-    }
-
-    private fun readUntilDelimiter(delimiter: Char): String? {
-        val sb = StringBuilder()
-        var data = stream.read()
-        if (data == -1) return null
-
-        while (data != -1 && data.toChar() != delimiter) {
-            sb.append(data.toChar())
-            data = stream.read()
-        }
-        return sb.toString()
+        return TreeEntry(permissions, name, hash)
     }
 
     private fun readHash(): String {
